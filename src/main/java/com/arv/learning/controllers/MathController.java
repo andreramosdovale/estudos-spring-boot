@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.arv.learning.utils.MathControllerUtils.convertToDouble;
+import static com.arv.learning.utils.MathControllerUtils.isNumeric;
+
 @RestController
 public class MathController {
 
@@ -20,22 +23,50 @@ public class MathController {
         return convertToDouble(numberOne) + convertToDouble(numberTwo);
     }
 
-    private Double convertToDouble(String value) {
-        if (value == null) return 0D;
-        String valueChecked = fixCurrency(value);
-        if (isNumeric(valueChecked)) return Double.parseDouble(valueChecked);
+    @GetMapping("/multi/{numberOne}/{numberTwo}")
+    public Double multi(
+            @PathVariable(value = "numberOne") String numberOne,
+            @PathVariable(value = "numberTwo") String numberTwo
+    ) {
+        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) {
+            throw new UnsupportedMathOperationsException("please set a numeric value");
+        }
 
-        return 0D;
+        return convertToDouble(numberOne) * convertToDouble(numberTwo);
     }
 
-    private boolean isNumeric(String value) {
-        if (value == null) return false;
-        String valueChecked = fixCurrency(value);
+    @GetMapping("/div/{numberOne}/{numberTwo}")
+    public Double div(
+            @PathVariable(value = "numberOne") String numberOne,
+            @PathVariable(value = "numberTwo") String numberTwo
+    ) {
+        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) {
+            throw new UnsupportedMathOperationsException("please set a numeric value");
+        }
 
-        return valueChecked.matches("[+-]?[0-9]*\\.?[0-9]+");
+        return convertToDouble(numberOne) / convertToDouble(numberTwo);
     }
 
-    private String fixCurrency(String value) {
-        return value.replaceAll(",", ".");
+    @GetMapping("/avg/{numberOne}/{numberTwo}")
+    public Double avg(
+            @PathVariable(value = "numberOne") String numberOne,
+            @PathVariable(value = "numberTwo") String numberTwo
+    ) {
+        if (!isNumeric(numberOne) || !isNumeric(numberTwo)) {
+            throw new UnsupportedMathOperationsException("please set a numeric value");
+        }
+
+        return convertToDouble(numberOne) + convertToDouble(numberTwo) / 2;
+    }
+
+    @GetMapping("/sqrt/{number}")
+    public Double sqrt(
+            @PathVariable(value = "number") String number
+    ) {
+        if (!isNumeric(number)) {
+            throw new UnsupportedMathOperationsException("please set a numeric value");
+        }
+
+        return Math.sqrt(convertToDouble(number));
     }
 }
